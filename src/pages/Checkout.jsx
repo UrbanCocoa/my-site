@@ -55,28 +55,37 @@ export default function Checkout() {
     // Collect all images from cart
     const allImages = cart.flatMap((item) => item.imageFiles || []);
     if (allImages.length === 0) {
-      alert("⚠️ No images found in cart! Please add images to your order.");
+      alert("⚠️ No images found in cart! Please go back and add images to your order.");
       return;
     }
 
     setIsSubmitting(true);
 
-    // Build order details text
+    // Prepare order details text
     const orderDetails = cart
       .map(
         (item, i) =>
-          `${i + 1}. ${item.name}\n - Projects: ${item.numProjects}\n - Price: ${item.price} ${item.currency}\n - Images: ${item.imageCount}\n - Instructions: ${item.instructions || "None"}`
+          `${i + 1}. ${item.name}\n` +
+          `- Projects: ${item.numProjects}\n` +
+          `- Price: ${item.price} ${item.currency}\n` +
+          `- Images: ${item.imageCount}\n` +
+          `- Instructions: ${item.instructions || "None"}`
       )
       .join("\n\n");
 
-    // Build FormData
+    // Prepare FormData
     const formPayload = new FormData();
     formPayload.append("name", formData.name);
     formPayload.append("email", formData.email);
     formPayload.append("phone", formData.phone || "Not provided");
     formPayload.append(
       "message",
-      `NEW ORDER RECEIVED\n\nCUSTOMER INFORMATION:\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone || "Not provided"}\n\nORDER DETAILS:\n${orderDetails}\n\nTOTAL: $${getCartTotal()} ${cart[0]?.currency || "CAD"}\nTotal Images: ${allImages.length}\nOrder Date: ${new Date().toLocaleString()}`
+      `NEW ORDER RECEIVED\n\nCUSTOMER INFORMATION:\n` +
+        `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${
+          formData.phone || "Not provided"
+        }\n\nORDER DETAILS:\n${orderDetails}\n\nTOTAL: $${getCartTotal()} ${
+          cart[0]?.currency || "CAD"
+        }\nTotal Images: ${allImages.length}\nOrder Date: ${new Date().toLocaleString()}`
     );
 
     // Attach images
@@ -85,21 +94,23 @@ export default function Checkout() {
     });
 
     try {
+      // Send to your backend
       const response = await fetch("http://localhost:3001/send-order", {
         method: "POST",
         body: formPayload,
       });
 
       const result = await response.json();
+
       if (result.success) {
-        alert("✅ Order submitted successfully! Check your email (including spam folder).");
+        alert("✅ Order submitted! Check your email for attachments.");
         clearCart();
         navigate("/");
       } else {
         alert(`❌ Error: ${result.message}`);
       }
     } catch (error) {
-      console.error("Error sending order:", error);
+      console.error("Error:", error);
       alert("❌ Failed to submit order.");
     } finally {
       setIsSubmitting(false);
@@ -132,7 +143,7 @@ export default function Checkout() {
                         <img
                           key={index}
                           src={URL.createObjectURL(file)}
-                          alt={`Preview ${index + 1}`}
+                          alt={`Upload Preview ${index}`}
                           className="w-12 h-12 object-cover rounded border border-accent4"
                         />
                       ))}
@@ -148,7 +159,9 @@ export default function Checkout() {
             <div className="border-t-2 border-accent4 pt-4">
               <div className="flex justify-between items-center text-2xl font-bold">
                 <span>Total:</span>
-                <span>${getCartTotal()} {cart[0]?.currency || "CAD"}</span>
+                <span>
+                  ${getCartTotal()} {cart[0]?.currency || "CAD"}
+                </span>
               </div>
             </div>
 
@@ -214,7 +227,7 @@ export default function Checkout() {
 
               <p className="text-sm text-center opacity-70 mt-4">
                 * Required fields<br />
-                Your images will be automatically sent with your order
+                Your images will be sent with your order
               </p>
             </form>
           </div>
