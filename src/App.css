@@ -1,0 +1,59 @@
+/* App-specific global styling for sections */
+
+header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+header h2, header p {
+  transition: all 0.3s ease;
+}
+
+header button {
+  transition: all 0.3s ease;
+}
+
+section {
+  padding: 2.5rem;
+}
+
+section img {
+  transition: all 0.5s ease;
+  max-width: 100%;
+  height: auto;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Slider container */
+.slider-container {
+  width: 100%;
+  max-width: 600px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Product card styling for services page */
+.product-card {
+  transition: all 0.3s ease;
+}
+.product-card:hover {
+  transform: scale(1.05);
+}
+
+/* Currency selector bottom-left corner */
+.currency-selector {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 50;
+}
