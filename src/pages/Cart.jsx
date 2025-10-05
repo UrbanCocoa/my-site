@@ -1,125 +1,92 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../context/CartContext.jsx";
-import Banner from "../components/Banner.jsx";
+import { useCart } from "../context/CartContext";
 
-export default function Cart() {
-  const navigate = useNavigate();
+const Cart = () => {
   const { cart, removeFromCart, clearCart, getCartTotal } = useCart();
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    navigate("/checkout");
+  };
 
   if (cart.length === 0) {
     return (
-      <div className="flex flex-col min-h-screen w-screen bg-accent3 text-accent5 font-custom">
-        <Banner height="h-32 md:h-44" />
-        
-        <header className="flex justify-center items-center p-8 bg-accent3 shadow-lg">
-          <h1 className="text-4xl font-extrabold">Your Cart</h1>
-        </header>
-
-        <main className="flex flex-col items-center justify-center flex-1 p-10">
-          <div className="text-center">
-            <p className="text-2xl mb-6">Your cart is empty!</p>
-            <button
-              onClick={() => navigate("/services")}
-              className="px-6 py-3 bg-accent2 hover:bg-accent4 text-accent5 rounded-lg font-semibold shadow-md transition"
-            >
-              Start Shopping
-            </button>
-          </div>
-        </main>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
+        <h1 className="text-3xl font-bold mb-4 text-gray-800">Your cart is empty 🛒</h1>
+        <button
+          onClick={() => navigate("/")}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition-all"
+        >
+          Go Back to Home
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen w-screen bg-accent3 text-accent5 font-custom">
-      <Banner height="h-32 md:h-44" />
-      
-      <header className="flex justify-center items-center p-8 bg-accent3 shadow-lg">
-        <h1 className="text-4xl font-extrabold">Your Cart</h1>
-      </header>
+    <div className="min-h-screen bg-gray-100 py-12 px-4">
+      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Your Order Summary</h1>
 
-      <main className="flex flex-col items-center p-10 flex-1 gap-6">
-        {/* Cart Items */}
-        <div className="w-full max-w-3xl space-y-4">
-          {cart.map((item) => (
-            <div
-              key={item.cartId}
-              className="bg-accent2 rounded-lg shadow-lg p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-            >
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2">{item.name}</h3>
-                <p className="text-sm opacity-80">Projects: {item.numProjects}</p>
-                {item.instructions && (
-                  <p className="text-sm opacity-80 mt-2">Instructions: {item.instructions}</p>
-                )}
-                {item.imageCount && (
-                  <p className="text-sm opacity-80">Images: {item.imageCount}</p>
-                )}
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <p className="text-xl font-bold">
-                  {item.currency === "CAD" && "$"}
-                  {item.currency === "USD" && "$"}
-                  {item.currency === "EUR" && "€"}
-                  {item.currency === "GBP" && "£"}
-                  {item.currency === "AUD" && "$"}
-                  {item.currency === "NZD" && "$"}
-                  {item.currency === "JPY" && "¥"}
-                  {item.currency === "CNY" && "¥"}
-                  {item.currency === "INR" && "₹"}
-                  {item.currency === "MXN" && "$"}
-                  {item.price} {item.currency}
-                </p>
-                
-                <button
-                  onClick={() => removeFromCart(item.cartId)}
-                  className="px-4 py-2 bg-accent4 hover:bg-darker text-accent5 rounded-lg font-semibold shadow-md transition"
-                >
-                  Remove
-                </button>
-              </div>
+        {cart.map((item, index) => (
+          <div
+            key={index}
+            className="border border-gray-200 rounded-xl p-6 mb-6 flex flex-col md:flex-row gap-6 shadow-sm"
+          >
+            <div className="flex-1">
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">{item.name}</h2>
+              <p className="text-gray-600 mb-1">Price: ${item.price} {item.currency}</p>
+              <p className="text-gray-600 mb-1">Projects: {item.numProjects}</p>
+              <p className="text-gray-600 mb-1">Images: {item.imageCount}</p>
+              {item.instructions && (
+                <p className="text-gray-700 mt-2 italic">Instructions: {item.instructions}</p>
+              )}
+              <button
+                onClick={() => removeFromCart(item)}
+                className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
+              >
+                Remove
+              </button>
             </div>
-          ))}
-        </div>
 
-        {/* Cart Summary */}
-        <div className="w-full max-w-3xl bg-accent2 rounded-lg shadow-lg p-6 mt-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-2xl font-bold">Total:</h3>
-            <p className="text-2xl font-bold">
-              ${getCartTotal()} {cart[0]?.currency || "CAD"}
-            </p>
+            {item.imagePreviews && item.imagePreviews.length > 0 && (
+              <div className="grid grid-cols-2 gap-3">
+                {item.imagePreviews.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`Preview ${i + 1}`}
+                    className="w-32 h-32 object-cover rounded-lg border border-gray-200 shadow-sm"
+                  />
+                ))}
+              </div>
+            )}
           </div>
+        ))}
 
-          <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex justify-between items-center border-t pt-6 mt-4">
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Total: ${getCartTotal()} {cart[0]?.currency || "CAD"}
+          </h2>
+          <div className="flex gap-4">
             <button
-              onClick={() => navigate("/services")}
-              className="flex-1 px-6 py-3 bg-accent3 hover:bg-darker text-accent5 rounded-lg font-semibold shadow-md transition"
-            >
-              Continue Shopping
-            </button>
-            
-            <button
-              onClick={() => {
-                if (window.confirm("Clear all items from cart?")) {
-                  clearCart();
-                }
-              }}
-              className="flex-1 px-6 py-3 bg-accent1 hover:bg-darker text-accent5 rounded-lg font-semibold shadow-md transition"
+              onClick={clearCart}
+              className="bg-gray-400 text-white px-5 py-2 rounded-lg hover:bg-gray-500 transition-all"
             >
               Clear Cart
             </button>
-            
             <button
-              onClick={() => navigate("/checkout")}
-              className="flex-1 px-6 py-3 bg-accent4 hover:bg-darker text-accent5 rounded-lg font-semibold shadow-md transition"
+              onClick={handleCheckout}
+              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all"
             >
-              Checkout
+              Proceed to Checkout →
             </button>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
-}
+};
+
+export default Cart;

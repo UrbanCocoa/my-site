@@ -9,7 +9,7 @@ export default function Checkout() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: ""
+    phone: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -35,14 +35,12 @@ export default function Checkout() {
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async () => {
-    console.log("handleSubmit called!");
-    
-    // Validate form
+    // Basic validation
     if (!formData.name || !formData.email) {
       alert("⚠️ Please fill out your name and email!");
       return;
@@ -54,56 +52,54 @@ export default function Checkout() {
       return;
     }
 
-    console.log("Validation passed!");
+    // Collect all images from cart
+    const allImages = cart.flatMap((item) => item.imageFiles || []);
+    if (allImages.length === 0) {
+      alert("⚠️ No images found in cart! Please add images to your order.");
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Prepare order details
-    const orderDetails = cart.map((item, i) => 
-      `${i + 1}. ${item.name}
-   - Projects: ${item.numProjects}
-   - Price: ${item.price} ${item.currency}
-   - Images: ${item.imageCount}
-   - Instructions: ${item.instructions || "None"}`
-    ).join("\n\n");
+    // Build order details text
+    const orderDetails = cart
+      .map(
+        (item, i) =>
+          `${i + 1}. ${item.name}\n - Projects: ${item.numProjects}\n - Price: ${item.price} ${item.currency}\n - Images: ${item.imageCount}\n - Instructions: ${item.instructions || "None"}`
+      )
+      .join("\n\n");
 
+    // Build FormData
     const formPayload = new FormData();
-    formPayload.append("access_key", "62b8a41e-d284-40f3-b9d9-ef4be1d0b3ee");
-    formPayload.append("subject", `New KooWhips Order from ${formData.name}`);
     formPayload.append("name", formData.name);
     formPayload.append("email", formData.email);
     formPayload.append("phone", formData.phone || "Not provided");
-    formPayload.append("message", 
-      `NEW ORDER RECEIVED\n\n` +
-      `CUSTOMER INFORMATION:\n` +
-      `Name: ${formData.name}\n` +
-      `Email: ${formData.email}\n` +
-      `Phone: ${formData.phone || "Not provided"}\n\n` +
-      `ORDER DETAILS:\n${orderDetails}\n\n` +
-      `TOTAL: $${getCartTotal()} ${cart[0]?.currency || "CAD"}\n\n` +
-      `Order Date: ${new Date().toLocaleString()}`
+    formPayload.append(
+      "message",
+      `NEW ORDER RECEIVED\n\nCUSTOMER INFORMATION:\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone || "Not provided"}\n\nORDER DETAILS:\n${orderDetails}\n\nTOTAL: $${getCartTotal()} ${cart[0]?.currency || "CAD"}\nTotal Images: ${allImages.length}\nOrder Date: ${new Date().toLocaleString()}`
     );
 
-    console.log("Sending to Web3Forms...");
+    // Attach images
+    allImages.forEach((file) => {
+      formPayload.append("attachments", file);
+    });
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const response = await fetch("http://localhost:3001/send-order", {
         method: "POST",
-        body: formPayload
+        body: formPayload,
       });
 
-      console.log("Response received! Status:", response.status);
       const result = await response.json();
-      console.log("Full response:", result);
-
       if (result.success) {
-        alert("✅ Order submitted! Check celicacoa@gmail.com (including spam folder)");
+        alert("✅ Order submitted successfully! Check your email (including spam folder).");
         clearCart();
         navigate("/");
       } else {
         alert(`❌ Error: ${result.message}`);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error sending order:", error);
       alert("❌ Failed to submit order.");
     } finally {
       setIsSubmitting(false);
@@ -113,7 +109,7 @@ export default function Checkout() {
   return (
     <div className="flex flex-col min-h-screen w-screen bg-accent3 text-accent5 font-custom">
       <Banner height="h-32 md:h-44" />
-      
+
       <header className="flex justify-center items-center p-8 bg-accent3 shadow-lg">
         <h1 className="text-4xl font-extrabold">Checkout</h1>
       </header>
@@ -123,14 +119,28 @@ export default function Checkout() {
         <div className="w-full lg:w-1/2 max-w-lg">
           <div className="bg-accent2 rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
-            
+
             <div className="space-y-4 mb-6">
               {cart.map((item) => (
                 <div key={item.cartId} className="border-b border-accent3 pb-4">
                   <h3 className="font-semibold">{item.name}</h3>
                   <p className="text-sm opacity-80">Projects: {item.numProjects}</p>
                   <p className="text-sm opacity-80">Images: {item.imageCount}</p>
-                  <p className="font-bold mt-2">${item.price} {item.currency}</p>
+                  {item.imageFiles && item.imageFiles.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {item.imageFiles.map((file, index) => (
+                        <img
+                          key={index}
+                          src={URL.createObjectURL(file)}
+                          alt={`Preview ${index + 1}`}
+                          className="w-12 h-12 object-cover rounded border border-accent4"
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <p className="font-bold mt-2">
+                    ${item.price} {item.currency}
+                  </p>
                 </div>
               ))}
             </div>
@@ -155,7 +165,7 @@ export default function Checkout() {
         <div className="w-full lg:w-1/2 max-w-lg">
           <div className="bg-accent2 rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-bold mb-4">Your Information</h2>
-            
+
             <form className="space-y-4">
               <div>
                 <label className="block font-semibold mb-2">Full Name *</label>
@@ -203,7 +213,8 @@ export default function Checkout() {
               </button>
 
               <p className="text-sm text-center opacity-70 mt-4">
-                * Required fields
+                * Required fields<br />
+                Your images will be automatically sent with your order
               </p>
             </form>
           </div>

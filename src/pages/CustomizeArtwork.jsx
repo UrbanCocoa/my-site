@@ -59,6 +59,7 @@ export default function CustomizeArtwork() {
   }, [numProjects, currency, rates]);
 
   const handleNumProjectsChange = (e) => setNumProjects(parseInt(e.target.value));
+  
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files).slice(0, 3); // Limit to 3
     setUploadedImages(files);
@@ -76,7 +77,7 @@ export default function CustomizeArtwork() {
       return;
     }
 
-    // Create cart item
+    // Create cart item with actual image files
     const cartItem = {
       type: "Digital Artwork",
       name: `Digital Artwork - ${numProjects} Project${numProjects > 1 ? 's' : ''}`,
@@ -84,7 +85,8 @@ export default function CustomizeArtwork() {
       price,
       currency,
       instructions: instructions.trim(),
-      imageCount: uploadedImages.length
+      imageCount: uploadedImages.length,
+      imageFiles: uploadedImages // Store the actual File objects
     };
 
     addToCart(cartItem);
@@ -124,7 +126,7 @@ export default function CustomizeArtwork() {
       </header>
 
       {/* Main Order Box */}
-      <main className="relative z-10 flex justify-center items-start p-10 flex-1 gap-8">
+      <main className="relative z-[100] flex justify-center items-start p-10 flex-1 gap-8">
         <div className="w-full max-w-lg p-8 flex flex-col gap-6 rounded-xl shadow-lg bg-accent2">
 
           {/* Number of Projects */}
