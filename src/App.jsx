@@ -29,8 +29,10 @@ import Zline from "./assets/photography/Zlineedit.jpg";
 import instaLogo from "./assets/KW/Instagram.png";
 import Banner from "./components/Banner.jsx";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function App() {
+  const navigate = useNavigate();
   const cartoonImages = [celicaImg, fcImg, fdImg, golfImg, kebinImg, nrdiftImg, rmzImg, rsxImg, toastImg, wrxImg];
   const photographyImages = [blueGTR, BRZ, elseEdit, FD, GTR, inside, Juke, snap, sup, TOAST, Zline];
 
@@ -40,7 +42,7 @@ export default function App() {
 
   // Photography belt refs
   const photoBeltRef = useRef(null);
-  let parallaxOffset = useRef(0);
+  const parallaxOffset = useRef(0);
 
   // Cartoon slider auto-advance with fade
   useEffect(() => {
@@ -89,7 +91,7 @@ export default function App() {
           </p>
           <div className="mt-6 flex space-x-4">
             <button
-              onClick={() => (window.location.href = "/services")}
+              onClick={() => navigate("/services")}
               className="px-6 py-2 bg-accent2 hover:bg-accent4 text-accent5 rounded-lg font-semibold shadow-md transition"
             >
               Get Started
@@ -128,6 +130,7 @@ export default function App() {
               <img
                 src={cartoonImages[currentCartoon]}
                 alt="Cartoon Slider"
+                loading="lazy"
                 className={`absolute h-5/6 object-contain rounded-md transition-opacity duration-700 ${fade ? "opacity-100" : "opacity-0"}`}
               />
             </div>

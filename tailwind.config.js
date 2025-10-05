@@ -14,7 +14,7 @@ module.exports = {
         primary: "#7F83AC", // for hover etc.
       },
       fontFamily: {
-        custom: ["August Shining", "sans-serif"],
+        custom: ["PANICKO", "sans-serif"],
       },
       keyframes: {
         "slide-down": {

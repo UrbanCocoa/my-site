@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Banner from "../components/Banner.jsx";
+import longBanner from "../assets/KW/Longbanner.png";
 
 // Product images
 import celicaImg from "../assets/cartoons/Celica.png";
@@ -21,9 +23,10 @@ const products = [
 ];
 
 export default function Services() {
+  const navigate = useNavigate();
   const [currency, setCurrency] = useState("CAD");
   const [convertedPrices, setConvertedPrices] = useState(products.map(p => p.priceCAD));
-  const [rates, setRates] = useState({});
+  const [rates, setRates] = useState({ CAD: 1 }); // Start with CAD rate
   const [currentSlides, setCurrentSlides] = useState(products.map(() => 0));
   const [fade, setFade] = useState(true);
 
@@ -31,14 +34,24 @@ export default function Services() {
   useEffect(() => {
     fetch("https://open.er-api.com/v6/latest/CAD")
       .then(res => res.json())
-      .then(data => setRates(data.rates))
-      .catch(err => console.log("Error fetching rates:", err));
+      .then(data => {
+        if (data.rates) {
+          setRates(data.rates);
+        }
+      })
+      .catch(err => {
+        console.log("Error fetching rates:", err);
+        // Keep default CAD rate if fetch fails
+      });
   }, []);
 
   // Update prices when currency changes
   useEffect(() => {
     if (rates[currency]) {
       setConvertedPrices(products.map(p => (p.priceCAD * rates[currency]).toFixed(2)));
+    } else {
+      // Fallback to CAD prices
+      setConvertedPrices(products.map(p => p.priceCAD));
     }
   }, [currency, rates]);
 
@@ -61,7 +74,7 @@ export default function Services() {
 
   return (
     <div className="flex flex-col min-h-screen w-screen bg-accent3 text-accent5 font-custom relative overflow-x-hidden">
-      <Banner /> 
+      <Banner bannerImage={longBanner} height="h-48 md:h-64" /> 
 
       <header className="flex justify-center items-center p-8 bg-accent3/90 shadow-lg animate-fade-in">
         <h1 className="text-4xl font-extrabold">Services</h1>
@@ -79,12 +92,14 @@ export default function Services() {
                 <img
                   src={product.slider[currentSlides[i]]}
                   alt="Background Blur"
+                  loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover scale-125 blur-lg opacity-60 z-0"
                 />
                 {/* Foreground sticker */}
                 <img
                   src={product.slider[currentSlides[i]]}
                   alt={product.name}
+                  loading="lazy"
                   className={`relative z-10 w-full h-full object-contain transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"}`}
                 />
               </div>
@@ -92,6 +107,7 @@ export default function Services() {
               <img
                 src={product.img}
                 alt={product.name}
+                loading="lazy"
                 className="relative z-10 max-w-full rounded-lg mb-4 object-contain"
               />
             )}
@@ -103,7 +119,7 @@ export default function Services() {
 
             {product.name === "Digital Artwork of your Car!" ? (
               <button
-                onClick={() => window.location.href = "/customize-artwork"}
+                onClick={() => navigate("/customize-artwork")}
                 className="relative z-10 px-6 py-3 bg-accent3 hover:bg-darker text-accent5 rounded-lg font-semibold shadow-md transition"
               >
                 Buy Now
