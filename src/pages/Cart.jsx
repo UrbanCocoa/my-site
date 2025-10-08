@@ -1,92 +1,87 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/CartContext.jsx";
 
-const Cart = () => {
-  const { cart, removeFromCart, clearCart, getCartTotal } = useCart();
+export default function Cart() {
   const navigate = useNavigate();
-
-  const handleCheckout = () => {
-    navigate("/checkout");
-  };
+  const { cart, removeFromCart, clearCart, getCartTotal } = useCart();
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
-        <h1 className="text-3xl font-bold mb-4 text-gray-800">Your cart is empty 🛒</h1>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-accent2 p-6">
+        <h2 className="text-3xl font-bold text-accent5 mb-6">Your Cart is Empty</h2>
         <button
-          onClick={() => navigate("/")}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition-all"
+          onClick={() => navigate("/services")}
+          className="px-6 py-3 bg-accent3 text-accent5 rounded-lg shadow-md hover:bg-darker transition"
         >
-          Go Back to Home
+          Continue Shopping
         </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
-      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Your Order Summary</h1>
+    <div className="min-h-screen bg-accent2 p-6">
+      <h2 className="text-3xl font-bold text-accent5 mb-6 text-center">Your Cart</h2>
+      <div className="max-w-4xl mx-auto flex flex-col gap-6">
+        {cart.map(item => (
+          <div key={item.cartId} className="flex flex-col md:flex-row gap-4 bg-accent3 p-4 rounded-xl shadow-md">
+            
+            {/* Image previews */}
+            <div className="flex gap-2">
+              {item.imageFiles.map((file, idx) => (
+                <img
+                  key={idx}
+                  src={URL.createObjectURL(file)}
+                  alt={`Preview ${idx}`}
+                  className="w-24 h-24 object-contain rounded-lg border border-accent2"
+                />
+              ))}
+            </div>
 
-        {cart.map((item, index) => (
-          <div
-            key={index}
-            className="border border-gray-200 rounded-xl p-6 mb-6 flex flex-col md:flex-row gap-6 shadow-sm"
-          >
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">{item.name}</h2>
-              <p className="text-gray-600 mb-1">Price: ${item.price} {item.currency}</p>
-              <p className="text-gray-600 mb-1">Projects: {item.numProjects}</p>
-              <p className="text-gray-600 mb-1">Images: {item.imageCount}</p>
-              {item.instructions && (
-                <p className="text-gray-700 mt-2 italic">Instructions: {item.instructions}</p>
-              )}
+            {/* Order info */}
+            <div className="flex-1 flex flex-col gap-1">
+              <h3 className="font-bold text-accent5 text-lg">{item.type} - {item.numProjects} Project{item.numProjects>1?'s':''}</h3>
+              {item.instructions && <p className="text-accent5">Instructions: {item.instructions}</p>}
+              <p className="font-semibold text-accent5">Price: {item.currency}{item.price}</p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col justify-between">
               <button
-                onClick={() => removeFromCart(item)}
-                className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
+                onClick={() => removeFromCart(item.cartId)}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
               >
                 Remove
               </button>
             </div>
-
-            {item.imagePreviews && item.imagePreviews.length > 0 && (
-              <div className="grid grid-cols-2 gap-3">
-                {item.imagePreviews.map((src, i) => (
-                  <img
-                    key={i}
-                    src={src}
-                    alt={`Preview ${i + 1}`}
-                    className="w-32 h-32 object-cover rounded-lg border border-gray-200 shadow-sm"
-                  />
-                ))}
-              </div>
-            )}
           </div>
         ))}
 
-        <div className="flex justify-between items-center border-t pt-6 mt-4">
-          <h2 className="text-2xl font-semibold text-gray-800">
-            Total: ${getCartTotal()} {cart[0]?.currency || "CAD"}
-          </h2>
-          <div className="flex gap-4">
+        {/* Cart summary & actions */}
+        <div className="flex flex-col md:flex-row justify-between items-center bg-accent3 p-4 rounded-xl shadow-md mt-6">
+          <p className="font-bold text-accent5 text-lg">Total: {cart[0]?.currency}{getCartTotal()}</p>
+          <div className="flex gap-4 mt-4 md:mt-0">
+            <button
+              onClick={() => navigate("/services")}
+              className="px-4 py-2 bg-accent4 text-accent5 rounded-lg shadow-md hover:bg-darker transition"
+            >
+              Continue Shopping
+            </button>
             <button
               onClick={clearCart}
-              className="bg-gray-400 text-white px-5 py-2 rounded-lg hover:bg-gray-500 transition-all"
+              className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition"
             >
               Clear Cart
             </button>
             <button
-              onClick={handleCheckout}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all"
+              onClick={() => navigate("/checkout")}
+              className="px-4 py-2 bg-accent5 text-accent2 rounded-lg shadow-md hover:bg-darker transition"
             >
-              Proceed to Checkout →
+              Proceed to Checkout
             </button>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Cart;
+}

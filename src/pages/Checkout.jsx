@@ -1,238 +1,182 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useCart } from "../context/CartContext.jsx";
-import Banner from "../components/Banner.jsx";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const { cart, getCartTotal, clearCart } = useCart();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { cart, clearCart } = useCart();
+  const location = useLocation();
 
-  if (cart.length === 0) {
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Use cart as the order
+  const orderItems = cart.length > 0 ? cart : location.state?.order || [];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!customerName || !customerEmail) {
+      alert("Name and email are required.");
+      return;
+    }
+
+    if (orderItems.length === 0) {
+      alert("No items in your cart.");
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+
+      formData.append("customerName", customerName);
+      formData.append("customerEmail", customerEmail);
+      if (customerPhone) formData.append("customerPhone", customerPhone);
+
+      // Append the order items as JSON
+      formData.append("orderItems", JSON.stringify(orderItems));
+
+      // Append files as attachments
+      orderItems.forEach((item) => {
+        if (item.imageFiles && item.imageFiles.length > 0) {
+          item.imageFiles.forEach((file) => {
+            if (file instanceof File) {
+              formData.append("attachments", file);
+            } else if (file.file instanceof File) {
+              formData.append("attachments", file.file);
+            }
+          });
+        }
+      });
+
+      const response = await fetch(
+        "https://koowhips-backend.onrender.com/send-order",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to submit order");
+
+      setSubmitted(true);
+      clearCart();
+    } catch (err) {
+      console.error("Error submitting order:", err);
+      setError("There was a problem submitting your order. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) {
     return (
-      <div className="flex flex-col min-h-screen w-screen bg-accent3 text-accent5 font-custom">
-        <Banner height="h-32 md:h-44" />
-        <main className="flex flex-col items-center justify-center flex-1 p-10">
-          <div className="text-center">
-            <p className="text-2xl mb-6">Your cart is empty!</p>
-            <button
-              onClick={() => navigate("/services")}
-              className="px-6 py-3 bg-accent2 hover:bg-accent4 text-accent5 rounded-lg font-semibold shadow-md transition"
-            >
-              Start Shopping
-            </button>
-          </div>
-        </main>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-accent2 text-accent5 text-center p-8">
+        <h1 className="text-4xl font-bold mb-4">Thank you for your order!</h1>
+        <p className="text-lg mb-8">
+          An invoice will be emailed to you shortly.
+        </p>
+        <button
+          onClick={() => navigate("/")}
+          className="px-6 py-3 bg-accent3 text-accent5 rounded-lg shadow hover:bg-darker transition"
+        >
+          Return Home
+        </button>
       </div>
     );
   }
 
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async () => {
-    // Basic validation
-    if (!formData.name || !formData.email) {
-      alert("⚠️ Please fill out your name and email!");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      alert("⚠️ Please enter a valid email address!");
-      return;
-    }
-
-    // Collect all images from cart
-    const allImages = cart.flatMap((item) => item.imageFiles || []);
-    if (allImages.length === 0) {
-      alert("⚠️ No images found in cart! Please go back and add images to your order.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    // Prepare order details text
-    const orderDetails = cart
-      .map(
-        (item, i) =>
-          `${i + 1}. ${item.name}\n` +
-          `- Projects: ${item.numProjects}\n` +
-          `- Price: ${item.price} ${item.currency}\n` +
-          `- Images: ${item.imageCount}\n` +
-          `- Instructions: ${item.instructions || "None"}`
-      )
-      .join("\n\n");
-
-    // Prepare FormData
-    const formPayload = new FormData();
-    formPayload.append("name", formData.name);
-    formPayload.append("email", formData.email);
-    formPayload.append("phone", formData.phone || "Not provided");
-    formPayload.append(
-      "message",
-      `NEW ORDER RECEIVED\n\nCUSTOMER INFORMATION:\n` +
-        `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${
-          formData.phone || "Not provided"
-        }\n\nORDER DETAILS:\n${orderDetails}\n\nTOTAL: $${getCartTotal()} ${
-          cart[0]?.currency || "CAD"
-        }\nTotal Images: ${allImages.length}\nOrder Date: ${new Date().toLocaleString()}`
-    );
-
-    // Attach images
-    allImages.forEach((file) => {
-      formPayload.append("attachments", file);
-    });
-
-    try {
-      // Send to your backend
-      const response = await fetch("http://localhost:3001/send-order", {
-        method: "POST",
-        body: formPayload,
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        alert("✅ Order submitted! Check your email for attachments.");
-        clearCart();
-        navigate("/");
-      } else {
-        alert(`❌ Error: ${result.message}`);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("❌ Failed to submit order.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
-    <div className="flex flex-col min-h-screen w-screen bg-accent3 text-accent5 font-custom">
-      <Banner height="h-32 md:h-44" />
+    <div className="flex flex-col items-center min-h-screen bg-accent2 text-accent5 p-6">
+      <h1 className="text-3xl font-bold mb-6">Review and Submit Your Order</h1>
 
-      <header className="flex justify-center items-center p-8 bg-accent3 shadow-lg">
-        <h1 className="text-4xl font-extrabold">Checkout</h1>
-      </header>
-
-      <main className="flex flex-col lg:flex-row justify-center gap-8 p-10 flex-1">
-        {/* Order Summary */}
-        <div className="w-full lg:w-1/2 max-w-lg">
-          <div className="bg-accent2 rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
-
-            <div className="space-y-4 mb-6">
-              {cart.map((item) => (
-                <div key={item.cartId} className="border-b border-accent3 pb-4">
-                  <h3 className="font-semibold">{item.name}</h3>
-                  <p className="text-sm opacity-80">Projects: {item.numProjects}</p>
-                  <p className="text-sm opacity-80">Images: {item.imageCount}</p>
-                  {item.imageFiles && item.imageFiles.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {item.imageFiles.map((file, index) => (
-                        <img
-                          key={index}
-                          src={URL.createObjectURL(file)}
-                          alt={`Upload Preview ${index}`}
-                          className="w-12 h-12 object-cover rounded border border-accent4"
-                        />
-                      ))}
-                    </div>
-                  )}
-                  <p className="font-bold mt-2">
-                    ${item.price} {item.currency}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="border-t-2 border-accent4 pt-4">
-              <div className="flex justify-between items-center text-2xl font-bold">
-                <span>Total:</span>
-                <span>
-                  ${getCartTotal()} {cart[0]?.currency || "CAD"}
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => navigate("/cart")}
-              className="w-full mt-4 px-4 py-2 bg-accent3 hover:bg-darker text-accent5 rounded-lg font-semibold shadow-md transition"
+      {orderItems.length === 0 ? (
+        <p className="text-lg text-accent5">No items in your cart.</p>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className="bg-accent3 p-8 rounded-2xl shadow-lg w-full max-w-2xl flex flex-col gap-6"
+        >
+          {/* Review Items */}
+          {orderItems.map((item, index) => (
+            <div
+              key={index}
+              className="border border-accent5 p-4 rounded-xl bg-accent2"
             >
-              ← Back to Cart
-            </button>
-          </div>
-        </div>
-
-        {/* Contact Form */}
-        <div className="w-full lg:w-1/2 max-w-lg">
-          <div className="bg-accent2 rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Your Information</h2>
-
-            <form className="space-y-4">
-              <div>
-                <label className="block font-semibold mb-2">Full Name *</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="John Doe"
-                  className="w-full p-3 rounded-lg bg-accent3 text-accent5 shadow-md focus:outline-none focus:ring-2 focus:ring-accent4"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold mb-2">Email Address *</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="john@example.com"
-                  className="w-full p-3 rounded-lg bg-accent3 text-accent5 shadow-md focus:outline-none focus:ring-2 focus:ring-accent4"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold mb-2">Phone Number (Optional)</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="(123) 456-7890"
-                  className="w-full p-3 rounded-lg bg-accent3 text-accent5 shadow-md focus:outline-none focus:ring-2 focus:ring-accent4"
-                />
-              </div>
-
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="w-full px-6 py-4 bg-accent4 hover:bg-darker text-accent5 rounded-lg font-bold text-lg shadow-md transition disabled:opacity-50 mt-6"
-              >
-                {isSubmitting ? "Submitting..." : "Submit Order"}
-              </button>
-
-              <p className="text-sm text-center opacity-70 mt-4">
-                * Required fields<br />
-                Your images will be sent with your order
+              <h2 className="font-bold text-xl mb-2">Item {index + 1}</h2>
+              <p>
+                <strong>Number of Projects:</strong> {item.numProjects}
               </p>
-            </form>
+              <p>
+                <strong>Instructions:</strong> {item.instructions || "None"}
+              </p>
+              <p>
+                <strong>Price:</strong> {item.price} {item.currency || ""}
+              </p>
+
+              {item.imageFiles && item.imageFiles.length > 0 && (
+                <div className="flex flex-wrap gap-3 mt-3">
+                  {item.imageFiles.map((file, i) => (
+                    <img
+                      key={i}
+                      src={file.preview || URL.createObjectURL(file)}
+                      alt={`Uploaded ${i}`}
+                      className="w-24 h-24 object-cover rounded-lg border border-accent5"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* Customer Info */}
+          <div className="flex flex-col gap-3">
+            <label className="font-semibold">Name (required):</label>
+            <input
+              type="text"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              required
+              className="p-2 rounded-lg bg-accent2 text-accent5"
+            />
+
+            <label className="font-semibold">Email (required):</label>
+            <input
+              type="email"
+              value={customerEmail}
+              onChange={(e) => setCustomerEmail(e.target.value)}
+              required
+              className="p-2 rounded-lg bg-accent2 text-accent5"
+            />
+
+            <label className="font-semibold">Phone (optional):</label>
+            <input
+              type="tel"
+              value={customerPhone}
+              onChange={(e) => setCustomerPhone(e.target.value)}
+              className="p-2 rounded-lg bg-accent2 text-accent5"
+            />
           </div>
-        </div>
-      </main>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="mt-6 px-6 py-3 bg-accent5 text-accent2 font-bold rounded-lg hover:opacity-90 transition"
+          >
+            {submitting ? "Submitting..." : "Submit Order"}
+          </button>
+
+          {error && <p className="text-red-500 mt-4">{error}</p>}
+        </form>
+      )}
     </div>
   );
 }

@@ -6,11 +6,10 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
 
   const addToCart = (item) => {
-    // Add unique ID to each cart item
     const cartItem = {
       ...item,
-      cartId: Date.now() + Math.random(), // Unique identifier
-      addedAt: new Date().toISOString()
+      cartId: Date.now() + Math.random(),
+      addedAt: new Date().toISOString(),
     };
     setCart(prev => [...prev, cartItem]);
   };
@@ -19,17 +18,13 @@ export function CartProvider({ children }) {
     setCart(prev => prev.filter(item => item.cartId !== cartId));
   };
 
-  const clearCart = () => {
-    setCart([]);
-  };
+  const clearCart = () => setCart([]);
 
   const getCartTotal = () => {
     return cart.reduce((total, item) => total + parseFloat(item.price), 0).toFixed(2);
   };
 
-  const getCartCount = () => {
-    return cart.length;
-  };
+  const getCartCount = () => cart.length;
 
   return (
     <CartContext.Provider value={{ 
@@ -45,11 +40,8 @@ export function CartProvider({ children }) {
   );
 }
 
-// Custom hook to use cart
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used within CartProvider");
-  }
+  if (!context) throw new Error("useCart must be used within CartProvider");
   return context;
 };
