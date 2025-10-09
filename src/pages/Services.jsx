@@ -1,3 +1,4 @@
+// src/pages/Services.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Banner from "../components/Banner.jsx";
@@ -41,7 +42,6 @@ export default function Services() {
       })
       .catch(err => {
         console.log("Error fetching rates:", err);
-        // Keep default CAD rate if fetch fails
       });
   }, []);
 
@@ -50,7 +50,6 @@ export default function Services() {
     if (rates[currency]) {
       setConvertedPrices(products.map(p => (p.priceCAD * rates[currency]).toFixed(2)));
     } else {
-      // Fallback to CAD prices
       setConvertedPrices(products.map(p => p.priceCAD));
     }
   }, [currency, rates]);
@@ -117,6 +116,7 @@ export default function Services() {
               {convertedPrices[i]} {currency}
             </p>
 
+            {/* Buy Now buttons */}
             {product.name === "Digital Artwork of your Car!" ? (
               <button
                 onClick={() => navigate("/customize-artwork")}
@@ -125,7 +125,10 @@ export default function Services() {
                 Buy Now
               </button>
             ) : (
-              <button className="relative z-10 px-6 py-3 bg-accent3 hover:bg-darker text-accent5 rounded-lg font-semibold shadow-md transition">
+              <button
+                onClick={() => navigate("/customize-stickers")}
+                className="relative z-10 px-6 py-3 bg-accent3 hover:bg-darker text-accent5 rounded-lg font-semibold shadow-md transition"
+              >
                 Buy Now
               </button>
             )}
