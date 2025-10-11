@@ -7,9 +7,9 @@ import longBanner from "../assets/KW/Longbanner.png";
 // Product images
 import celicaImg from "../assets/cartoons/Celica.png";
 import jukeStickers from "../assets/pics/JukeStickers.jpg";
-import duraMaxStickers from "../assets/pics/DuraMaxStickers.JPG";
+import duraMaxStickers from "../assets/pics/DuraMaxStickers.jpg";
 import threeSticker from "../assets/pics/3Sticker.PNG";
-import stickerWindow from "../assets/pics/StickerWindow.PNG";
+import stickerWindow from "../assets/pics/StickerWindow.png";
 
 const currencies = ["CAD","USD","EUR","GBP","AUD","NZD","JPY","CNY","INR","MXN"];
 

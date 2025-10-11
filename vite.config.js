@@ -1,22 +1,28 @@
-// vite.config.js
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  base: '/',
   plugins: [react()],
-  server: {
-    hmr: false,
-  },
-  esbuild: {
-    legalComments: 'none',
-  },
+  // This ensures your app loads correctly on subpages like /customize-artwork
+  base: "/",
+
+  // Allow uppercase image extensions (prevents “Failed to parse source” build errors)
+  assetsInclude: ["**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", "**/*.svg", "**/*.PNG", "**/*.JPG", "**/*.JPEG"],
+
+  // Recommended for Render or GitHub Pages static deployments
   build: {
+    outDir: "dist",
+    emptyOutDir: true,
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'index.html'),
+      output: {
+        manualChunks: undefined, // Helps with SPA routing issues
       },
     },
+  },
+
+  // Prevent CORS errors in dev environment
+  server: {
+    port: 5173,
+    open: true,
   },
 });
