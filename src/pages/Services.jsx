@@ -1,7 +1,7 @@
 // src/pages/Services.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Banner from "../components/banner.jsx";
+import Banner from "../components/Banner.jsx";
 import longBanner from "../assets/KW/longbanner.png";
 
 // Product images

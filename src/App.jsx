@@ -27,7 +27,7 @@ import TOAST from "./assets/photography/toast.jpg";
 import Zline from "./assets/photography/zlineedit.jpg";
 
 import instaLogo from "./assets/KW/instagram.png";
-import Banner from "./components/banner.jsx";
+import Banner from "./components/Banner.jsx";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 

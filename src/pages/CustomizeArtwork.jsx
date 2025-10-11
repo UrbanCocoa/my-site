@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
-import Banner from "../components/banner.jsx";
+import Banner from "../components/Banner.jsx";
 import Bigpage from "../assets/KW/bigpage.png";
 
 const currencies = ["CAD","USD","EUR","GBP","AUD","NZD","JPY","CNY","INR","MXN"];
