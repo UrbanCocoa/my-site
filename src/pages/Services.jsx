@@ -1,15 +1,15 @@
 // src/pages/Services.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Banner from "../components/Banner.jsx";
-import longBanner from "../assets/KW/Longbanner.png";
+import Banner from "../components/banner.jsx";
+import longBanner from "../assets/KW/longbanner.png";
 
 // Product images
-import celicaImg from "../assets/cartoons/Celica.png";
-import jukeStickers from "../assets/pics/JukeStickers.jpg";
-import duraMaxStickers from "../assets/pics/DuraMaxStickers.jpg";
-import threeSticker from "../assets/pics/3Sticker.PNG";
-import stickerWindow from "../assets/pics/StickerWindow.png";
+import celicaImg from "../assets/cartoons/celica.png";
+import jukeStickers from "../assets/pics/jukestickers.jpg";
+import duraMaxStickers from "../assets/pics/duramaxstickers.jpg";
+import threeSticker from "../assets/pics/3sticker.PNG";
+import stickerWindow from "../assets/pics/stickerWindow.png";
 
 const currencies = ["CAD","USD","EUR","GBP","AUD","NZD","JPY","CNY","INR","MXN"];
 

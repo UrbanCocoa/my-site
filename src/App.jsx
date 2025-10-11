@@ -1,33 +1,33 @@
 import bannerImg from "./assets/KW/banner.png";
-import KWpage from "./assets/KW/KWpage.png";
+import KWpage from "./assets/KW/kwpage.png";
 
 // Cartoon slider images
-import celicaImg from "./assets/cartoons/Celica.png";
-import fcImg from "./assets/cartoons/FC.png";
-import fdImg from "./assets/cartoons/FD.png";
-import golfImg from "./assets/cartoons/Golf.png";
-import kebinImg from "./assets/cartoons/KEBIN.png";
-import nrdiftImg from "./assets/cartoons/NRDRIFT.png";
-import rmzImg from "./assets/cartoons/RMZ.png";
-import rsxImg from "./assets/cartoons/RSX.png";
-import toastImg from "./assets/cartoons/TOAST.png";
-import wrxImg from "./assets/cartoons/WRX.png";
+import celicaImg from "./assets/cartoons/celica.png";
+import fcImg from "./assets/cartoons/fc.png";
+import fdImg from "./assets/cartoons/fd.png";
+import golfImg from "./assets/cartoons/golf.png";
+import kebinImg from "./assets/cartoons/kebin.png";
+import nrdiftImg from "./assets/cartoons/nrdrift.png";
+import rmzImg from "./assets/cartoons/rmz.png";
+import rsxImg from "./assets/cartoons/rsx.png";
+import toastImg from "./assets/cartoons/toast.png";
+import wrxImg from "./assets/cartoons/wrx.png";
 
 // Photography slider images
-import blueGTR from "./assets/photography/blueGTRedit.jpg";
-import BRZ from "./assets/photography/BRZedit.jpg";
+import blueGTR from "./assets/photography/bluegtredit.jpg";
+import BRZ from "./assets/photography/brzedit.jpg";
 import elseEdit from "./assets/photography/elseedit.jpg";
-import FD from "./assets/photography/FDedit.jpg";
-import GTR from "./assets/photography/GTRedit.jpg";
+import FD from "./assets/photography/fdedit.jpg";
+import GTR from "./assets/photography/gtredit.jpg";
 import inside from "./assets/photography/insideedit.jpg";
-import Juke from "./assets/photography/Jukeedit.jpg";
+import Juke from "./assets/photography/jukeedit.jpg";
 import snap from "./assets/photography/snapedit.jpg";
 import sup from "./assets/photography/sup.jpg";
-import TOAST from "./assets/photography/TOAST.jpg";
-import Zline from "./assets/photography/Zlineedit.jpg";
+import TOAST from "./assets/photography/toast.jpg";
+import Zline from "./assets/photography/zlineedit.jpg";
 
-import instaLogo from "./assets/KW/Instagram.png";
-import Banner from "./components/Banner.jsx";
+import instaLogo from "./assets/KW/instagram.png";
+import Banner from "./components/banner.jsx";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
