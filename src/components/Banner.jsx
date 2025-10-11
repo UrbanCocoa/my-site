@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
-import defaultBanner from "../assets/KW/Banner.png";
+import defaultBanner from "../assets/KW/banner.png";
 import cartIcon from "../assets/KW/cart.png";
 
 export default function Banner({ bannerImage, height = "h-48 md:h-64" }) {
