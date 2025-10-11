@@ -1,4 +1,4 @@
-import bannerImg from "./assets/KW/Banner.png";
+import bannerImg from "./assets/KW/banner.png";
 import KWpage from "./assets/KW/KWpage.png";
 
 // Cartoon slider images
