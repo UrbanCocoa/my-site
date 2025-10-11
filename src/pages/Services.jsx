@@ -8,7 +8,7 @@ import longBanner from "../assets/KW/longbanner.png";
 import celicaImg from "../assets/cartoons/celica.png";
 import jukeStickers from "../assets/pics/jukestickers.jpg";
 import duraMaxStickers from "../assets/pics/duramaxstickers.jpg";
-import threeSticker from "../assets/pics/3sticker.PNG";
+import threeSticker from "../assets/pics/3sticker.png";
 import stickerWindow from "../assets/pics/stickerWindow.png";
 
 const currencies = ["CAD","USD","EUR","GBP","AUD","NZD","JPY","CNY","INR","MXN"];
