@@ -40,8 +40,17 @@ export default function Checkout() {
       formData.append("customerEmail", customerEmail);
       if (customerPhone) formData.append("customerPhone", customerPhone);
 
-      // Append the order items as JSON
-      formData.append("orderItems", JSON.stringify(orderItems));
+      // Append the order items as JSON, including orderType
+      formData.append(
+        "orderItems",
+        JSON.stringify(
+          orderItems.map((item) => ({
+            ...item,
+            orderType: item.orderType || "Digital Artwork", // default fallback
+            instructions: item.instructions || "",
+          }))
+        )
+      );
 
       // Append files as attachments
       orderItems.forEach((item) => {
@@ -111,6 +120,10 @@ export default function Checkout() {
               className="border border-accent5 p-4 rounded-xl bg-accent2"
             >
               <h2 className="font-bold text-xl mb-2">Item {index + 1}</h2>
+              <p>
+                <strong>Order Type:</strong>{" "}
+                {item.orderType || "Digital Artwork"}
+              </p>
               <p>
                 <strong>Number of Projects:</strong> {item.numProjects}
               </p>
