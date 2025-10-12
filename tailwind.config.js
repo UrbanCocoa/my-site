@@ -1,17 +1,20 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
   theme: {
     extend: {
       colors: {
-        accent1: "#7F83AC", // primary
+        accent1: "#7F83AC",
         accent2: "#404463",
         accent3: "#202231",
         accent4: "#B9723C",
         accent5: "#D4A27B",
         dark: "#191716",
         darker: "#0f0e0d",
-        primary: "#7F83AC", // for hover etc.
+        primary: "#7F83AC",
       },
       fontFamily: {
         custom: ["PANICKO", "sans-serif"],

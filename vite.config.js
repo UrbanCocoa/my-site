@@ -1,53 +1,41 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import fs from "fs";
-import path from "path";
 
 export default defineConfig({
+  // 🧩 React support
   plugins: [react()],
+
+  // ✅ Keeps your paths correct for Render and custom domains
   base: "/",
+
+  // 📁 Ensures static assets like images and _redirects are copied over
+  publicDir: "public",
+
+  // 🖼️ Include common image types (case-insensitive)
   assetsInclude: [
     "**/*.png",
     "**/*.jpg",
     "**/*.jpeg",
     "**/*.gif",
     "**/*.svg",
-    "**/*.PNG",
-    "**/*.JPG",
-    "**/*.JPEG"
+    "**/*.webp",
+    "**/*.avif"
   ],
+
+  // ⚙️ Build configuration
   build: {
-    outDir: "dist",
-    emptyOutDir: true,
+    outDir: "dist",        // where Render looks for final site
+    emptyOutDir: true,     // cleans dist before each build
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        manualChunks: undefined, // avoids chunk-splitting issues
       },
     },
-    // Copy _redirects after build
-    // Ensures SPA routing works on Render
-    emptyOutDir: true,
-    sourcemap: false,
   },
+
+  // 🧪 Local development server
   server: {
     port: 5173,
     open: true,
   },
-  // Custom Vite plugin to copy _redirects
-  plugins: [
-    react(),
-    {
-      name: "copy-redirects",
-      closeBundle() {
-        const publicRedirects = path.resolve(__dirname, "public", "_redirects");
-        const distRedirects = path.resolve(__dirname, "dist", "_redirects");
-        if (fs.existsSync(publicRedirects)) {
-          fs.copyFileSync(publicRedirects, distRedirects);
-          console.log("_redirects file copied to dist");
-        } else {
-          console.warn("⚠️ _redirects file not found in public folder");
-        }
-      }
-    }
-  ]
 });
